@@ -122,6 +122,9 @@ EOF
 				hba_rules_type[1-9]*)
 					_tpl="#hba_rules_type#"
 					;;
+				hba_rules_address[1-9]*)
+					_tpl="#hba_rules_address#"
+					;;
 				hba_rules_database[1-9]*)
 					_tpl="#hba_rules_database#"
 					;;
@@ -139,11 +142,11 @@ EOF
 					;;
 			esac
 
-			eval _val=\${${i}}
+			eval _val="\${${i}}"
 			[ -z "${_val}" ] && continue
 
 			rule_name="XXX"		# concat from all field
-			sed -i${sed_delimer}'' -Ees/"${_tpl}"/"${_val}"/g ${tmpfile}
+			sed -i${sed_delimer}'' -Ees@"${_tpl}"@"${_val}"@g ${tmpfile}
 		done
 		cat ${tmpfile} >> ${tmp_common_yaml}
 		cp -a ${tmpfile} /tmp/x.yaml

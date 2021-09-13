@@ -47,6 +47,7 @@ add()
 		${SQLITE3_CMD} ${formfile} <<EOF
 BEGIN TRANSACTION;
 INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,xattr,type,link,groupname ) VALUES ( "forms", ${index},${order_id},"hba_rules_type${index}","type of connection, e.g: 'host'",'host','','',1, "maxlen=60", "dynamic", "inputbox", "", "${groupname}" );
+INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,xattr,type,link,groupname ) VALUES ( "forms", ${index},${order_id},"hba_rules_address${index}","address for host type",'0.0.0.0/0','0.0.0.0/0','',1, "maxlen=60", "dynamic", "inputbox", "", "${groupname}" );
 INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,xattr,type,link,groupname ) VALUES ( "forms", ${index},${order_id},"hba_rules_database${index}","list of database name(s) to which this rule applies",'','','',1, "maxlen=60", "dynamic", "inputbox", "", "${groupname}" );
 INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,xattr,type,link,groupname ) VALUES ( "forms", ${index},${order_id},"hba_rules_user${index}","list of user and group name(s) to which this rule applies",'','','',1, "maxlen=60", "dynamic", "inputbox", "", "${groupname}" );
 INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,xattr,type,link,groupname ) VALUES ( "forms", ${index},${order_id},"hba_rules_auth_method${index}","authentication method, e.g: password",'password','password','',1, "maxlen=60", "dynamic", "inputbox", "", "${groupname}" );
