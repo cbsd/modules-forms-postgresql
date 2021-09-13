@@ -62,12 +62,9 @@ INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,a
 INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,type,link,groupname ) VALUES ( "forms", 1,24,"temp_buffers","temp_buffers",'64MB','64MB','',1, "maxlen=42", "inputbox", "", "" );
 INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,type,link,groupname ) VALUES ( "forms", 1,25,"timezone","timezone",'UTC','UTC','',1, "maxlen=42", "inputbox", "", "" );
 INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,type,link,groupname ) VALUES ( "forms", 1,26,"wal_compression","wal_compression",'on','on','',1, "maxlen=42", "inputbox", "", "" );
-INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,type,link,groupname ) VALUES ( "forms", 1,27,"wal_keep_segments","wal_keep_segments",'128','128','',1, "maxlen=42", "inputbox", "", "" );
 INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,type,link,groupname ) VALUES ( "forms", 1,28,"wal_level","wal_level",'hot_standby','hot_standby','',1, "maxlen=42", "inputbox", "", "" );
 INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,type,link,groupname ) VALUES ( "forms", 1,29,"work_mem","work_mem",'64MB','64MB','',1, "maxlen=42", "inputbox", "", "" );
-
 INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,type,link,groupname ) VALUES ( "forms", 1,100,"","Desc",'2','127.0.0.1','',1, "maxlen=42", "inputbox", "", "" );
-
 INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,type,link,groupname ) VALUES ( "forms", 1,200,"-Databases","Databases",'Databases','-','',1, "maxlen=60", "delimer", "", "dbgroup" );
 INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,type,link,groupname ) VALUES ( "forms", 1,201,"databases","Add databases",'201','','',0, "maxlen=60", "group_add", "", "dbgroup" );
 INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,type,link,groupname ) VALUES ( "forms", 1,300,"-HBARules","HBA Rules",'HBA Rules','-','',1, "maxlen=60", "delimer", "", "hbagroup" );

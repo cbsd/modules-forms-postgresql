@@ -1,0 +1,6 @@
+wal_keep_segments (depreceted PgSQL 12)
+wal_keep_size (in PgSQL13+)
+
+https://postgresqlco.nf/doc/en/param/wal_keep_segments/
+wal_keep_size = wal_keep_segments * wal_segment_size (typically 16MB)
+
