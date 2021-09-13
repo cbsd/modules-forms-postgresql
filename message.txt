@@ -3,5 +3,9 @@
  via: cbsd jconstruct-tui -> profile -> cbsdpuppet
 
  please use:
-   cbsd forms module=postgresql jname=YOUR_JAIL
+   cbsd forms module=postgresql jname=YOUR_JAIL [inter=0]
 
+ The main parameters that you can use via ~cbsd/etc/forms_env.conf or env(1):
+
+ % cbsd forms module=postgresql vars
+ 
