@@ -1,0 +1,3 @@
+  #roles_name#:
+    password_hash: '#roles_password_hash#'
+    superuser: #roles_superuser#

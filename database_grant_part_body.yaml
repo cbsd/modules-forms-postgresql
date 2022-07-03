@@ -1,0 +1,4 @@
+  #database_grant_name#:
+    privilege: '#database_grant_privilege#'
+    db: '#database_grant_db#'
+    role: '#database_grant_role#'

@@ -67,8 +67,12 @@ INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,a
 INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,type,link,groupname ) VALUES ( "forms", 1,100,"","Desc",'2','127.0.0.1','',1, "maxlen=42", "inputbox", "", "" );
 INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,type,link,groupname ) VALUES ( "forms", 1,200,"-Databases","Databases",'Databases','-','',1, "maxlen=60", "delimer", "", "dbgroup" );
 INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,type,link,groupname ) VALUES ( "forms", 1,201,"databases","Add databases",'201','','',0, "maxlen=60", "group_add", "", "dbgroup" );
-INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,type,link,groupname ) VALUES ( "forms", 1,300,"-HBARules","HBA Rules",'HBA Rules','-','',1, "maxlen=60", "delimer", "", "hbagroup" );
-INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,type,link,groupname ) VALUES ( "forms", 1,301,"hba_rules","HBA Rules",'301','','',0, "maxlen=60", "group_add", "", "hbagroup" );
+INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,type,link,groupname ) VALUES ( "forms", 1,300,"-Roles","Roles",'Roles','-','',1, "maxlen=60", "delimer", "", "rolesgroup" );
+INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,type,link,groupname ) VALUES ( "forms", 1,301,"roles","Add roles",'301','','',0, "maxlen=60", "group_add", "", "rolesgroup" );
+INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,type,link,groupname ) VALUES ( "forms", 1,400,"-DBGrant","DB GRANT",'DB GRANT','-','',1, "maxlen=60", "delimer", "", "database_grantgroup" );
+INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,type,link,groupname ) VALUES ( "forms", 1,401,"database_grant","Add DB GRANT",'401','','',0, "maxlen=60", "group_add", "", "database_grantgroup" );
+INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,type,link,groupname ) VALUES ( "forms", 1,500,"-HBARules","HBA Rules",'HBA Rules','-','',1, "maxlen=60", "delimer", "", "hbagroup" );
+INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,type,link,groupname ) VALUES ( "forms", 1,501,"hba_rules","HBA Rules",'501','','',0, "maxlen=60", "group_add", "", "hbagroup" );
 COMMIT;
 EOF
 

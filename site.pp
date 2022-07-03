@@ -28,6 +28,11 @@ generate_hieradata()
 	local databases_part_body="${my_module_dir}/databases_part_body.yaml"
 	local hba_rules_part_header="${my_module_dir}/hba_rules_part_header.yaml"
 	local hba_rules_part_body="${my_module_dir}/hba_rules_part_body.yaml"
+	local roles_part_header="${my_module_dir}/roles_part_header.yaml"
+	local roles_part_body="${my_module_dir}/roles_part_body.yaml"
+	local database_grant_part_header="${my_module_dir}/database_grant_part_header.yaml"
+	local database_grant_part_body="${my_module_dir}/database_grant_part_body.yaml"
+
 	local _val _tpl
 
 	if [ ! -r ${databases_part_header} ]; then
@@ -50,8 +55,19 @@ generate_hieradata()
 		exit 0
 	fi
 
+	if [ ! -r ${roles_part_header} ]; then
+		echo "no such ${roles_part_header}"
+		exit 0
+	fi
+
+	if [ ! -r ${roles_part_body} ]; then
+		echo "no such ${roles_part_body}"
+		exit 0
+	fi
+
 	local form_add_databases=0
 	local form_add_hba_rule=0
+	local form_add_roles_rule=0
 
 	if [ -f "${my_common_yaml}" ]; then
 		local tmp_common_yaml=$( mktemp )
@@ -67,6 +83,14 @@ generate_hieradata()
 				hba_rules_type[1-9]*)
 					form_add_hba_rule=$(( form_add_hba_rule + 1 ))
 					continue;
+					;;
+				roles_name[1-9]*)
+					form_add_roles=$(( form_add_roles + 1 ))
+					continue
+					;;
+				database_grant_name[1-9]*)
+					form_add_database_grant=$(( form_add_database_grant + 1 ))
+					continue
 					;;
 				-*)
 					# delimier params
@@ -149,7 +173,71 @@ EOF
 			sed -i${sed_delimer}'' -Ees@"${_tpl}"@"${_val}"@g ${tmpfile}
 		done
 		cat ${tmpfile} >> ${tmp_common_yaml}
-		cp -a ${tmpfile} /tmp/x.yaml
+		rm -f ${tmpfile}
+	fi
+
+	# custom roles rules
+	if [ ${form_add_roles} -ne 0 ]; then
+		cat ${roles_part_header} >> ${tmp_common_yaml}
+		tmpfile=$( mktemp )
+		cp -a ${roles_part_body} ${tmpfile}
+		for i in ${param}; do
+			case "${i}" in
+				roles_name[1-9]*)
+					_tpl="#roles_name#"
+					;;
+				roles_password_hash[1-9]*)
+					_tpl="#roles_password_hash#"
+					;;
+				roles_superuser[1-9]*)
+					_tpl="#roles_superuser#"
+					;;
+				*)
+					continue
+					;;
+			esac
+
+			eval _val="\${${i}}"
+			[ -z "${_val}" ] && continue
+
+			rule_name="XXX"		# concat from all field
+			sed -i${sed_delimer}'' -Ees@"${_tpl}"@"${_val}"@g ${tmpfile}
+		done
+		cat ${tmpfile} >> ${tmp_common_yaml}
+		rm -f ${tmpfile}
+	fi
+
+	# custom database_grant rules
+	if [ ${form_add_database_grant} -ne 0 ]; then
+		cat ${database_grant_part_header} >> ${tmp_common_yaml}
+		tmpfile=$( mktemp )
+		cp -a ${database_grant_part_body} ${tmpfile}
+		for i in ${param}; do
+			case "${i}" in
+				database_grant_name[1-9]*)
+					_tpl="#database_grant_name#"
+					;;
+				database_grant_privilege[1-9]*)
+					_tpl="#database_grant_privilege#"
+					;;
+				database_grant_db[1-9]*)
+					_tpl="#database_grant_db#"
+					;;
+				database_grant_role[1-9]*)
+					_tpl="#database_grant_role#"
+					;;
+				*)
+					continue
+					;;
+			esac
+
+			eval _val="\${${i}}"
+			[ -z "${_val}" ] && continue
+
+			rule_name="XXX"		# concat from all field
+			sed -i${sed_delimer}'' -Ees@"${_tpl}"@"${_val}"@g ${tmpfile}
+		done
+		cat ${tmpfile} >> ${tmp_common_yaml}
 		rm -f ${tmpfile}
 	fi
 
