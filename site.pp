@@ -68,6 +68,8 @@ generate_hieradata()
 	local form_add_databases=0
 	local form_add_hba_rule=0
 	local form_add_roles_rule=0
+	local form_add_roles=0
+	local form_add_database_grant=0
 
 	if [ -f "${my_common_yaml}" ]; then
 		local tmp_common_yaml=$( mktemp )
