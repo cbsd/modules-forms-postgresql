@@ -47,22 +47,22 @@ add()
 		# Put boolean for use_sasl_yesno
 		${SQLITE3_CMD} ${formfile} << EOF
 BEGIN TRANSACTION;
-INSERT INTO is_superuser_truefalse ( text, order_id ) VALUES ( "true", 1 );
-INSERT INTO is_superuser_truefalse ( text, order_id ) VALUES ( "false", 0 );
+INSERT INTO is_superuser_truefalse ( text, order_id ) VALUES ( 'true', 1 );
+INSERT INTO is_superuser_truefalse ( text, order_id ) VALUES ( 'false', 0 );
 COMMIT;
 EOF
 
 		${SQLITE3_CMD} ${formfile} <<EOF
 BEGIN TRANSACTION;
-INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,xattr,type,link,groupname ) VALUES ( "forms", ${index},${order_id},"roles_name${index}","uniq database name, e.g: mydb",'pguser${index}','pguser${index}','',1, "maxlen=60", "dynamic", "inputbox", "", "${groupname}" );
-INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,xattr,type,link,groupname ) VALUES ( "forms", ${index},${order_id},"roles_password_hash${index}", "password for user",'password{index}', 'password${index}','',1, "maxlen=60", "dynamic", "inputbox", "", "${groupname}" );
-INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,xattr,type,link,groupname ) VALUES ( "forms", ${index},${order_id},"roles_superuser${index}","Is superuser?",'superuser${index}','superuser${index}','false',1, "maxlen=60", "dynamic", "radio", "is_superuser_truefalse", "${groupname}" );
+INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,xattr,type,link,groupname ) VALUES ( 'forms', ${index},${order_id},'roles_name${index}','uniq database name, e.g: mydb','pguser${index}','pguser${index}','',1, 'maxlen=60', 'dynamic', 'inputbox', '', '${groupname}' );
+INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,xattr,type,link,groupname ) VALUES ( 'forms', ${index},${order_id},'roles_password_hash${index}', 'password for user','password{index}', 'password${index}','',1, 'maxlen=60', 'dynamic', 'inputbox', '', '${groupname}' );
+INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,xattr,type,link,groupname ) VALUES ( 'forms', ${index},${order_id},'roles_superuser${index}','Is superuser?','superuser${index}','superuser${index}','false',1, 'maxlen=60', 'dynamic', 'radio', 'is_superuser_truefalse', '${groupname}' );
 COMMIT;
 EOF
 	else
 		/bin/cat <<EOF
 BEGIN TRANSACTION;
-INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,xattr,type,link,groupname ) VALUES ( "forms", ${index},${order_id},"roles_name${index}","roles part ${index}",'','','',1, "maxlen=60", "dynamic", "inputbox", "", "${groupname}" );
+INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,xattr,type,link,groupname ) VALUES ( 'forms', ${index},${order_id},'roles_name${index}','roles part ${index}','','','',1, 'maxlen=60', 'dynamic', 'inputbox', '', '${groupname}' );
 COMMIT;
 EOF
 	fi
@@ -75,13 +75,13 @@ del()
 	if [ -r "${formfile}" ]; then
 		${SQLITE3_CMD} ${formfile} <<EOF
 BEGIN TRANSACTION;
-DELETE FROM forms WHERE group_id = "${index}" AND groupname = "${groupname}";
+DELETE FROM forms WHERE group_id = '${index}' AND groupname = '${groupname}';
 COMMIT;
 EOF
 	else
 		/bin/cat <<EOF
 BEGIN TRANSACTION;
-DELETE FROM forms WHERE group_id = "${index}" AND groupname = "${groupname}";
+DELETE FROM forms WHERE group_id = '${index}' AND groupname = '${groupname}';
 COMMIT;
 EOF
 	fi
@@ -98,7 +98,7 @@ get_index()
 	local new_index
 
 	[ ! -r "${formfile}" ] && err 1 "formfile not readable: ${formfile}"
-	new_index=$( ${SQLITE3_CMD} ${formfile} "SELECT group_id FROM forms WHERE groupname = \"${groupname}\" ORDER BY group_id DESC LIMIT 1" )
+	new_index=$( ${SQLITE3_CMD} ${formfile} "SELECT group_id FROM forms WHERE groupname = '${groupname}' ORDER BY group_id DESC LIMIT 1" )
 
 	case "${action}" in
 		add|create)
