@@ -22,6 +22,7 @@ set -e
 . ${distdir}/cbsd.conf
 . ${subrdir}/tools.subr
 . ${subr}
+. ${subrdir}/forms.subr
 set +e
 
 FORM_PATH="${workdir}/formfile"
@@ -29,7 +30,7 @@ FORM_PATH="${workdir}/formfile"
 [ ! -d "${FORM_PATH}" ] && err 1 "No such ${FORM_PATH}"
 
 ###
-groupname="database_grantgroup"
+groupname="database_grant"
 
 err() {
 	exitval=$1
@@ -40,20 +41,22 @@ err() {
 
 add()
 {
+	local _custom_id=
+	_custom_id=$( get_custom_id "database_grant_name" )
 
 	if [ -r "${formfile}" ]; then
 		${SQLITE3_CMD} ${formfile} <<EOF
 BEGIN TRANSACTION;
-INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,xattr,type,link,groupname ) VALUES ( 'forms', ${index},${order_id},'database_grant_name${index}','uniq grant name, e.g: mydb','grant${index}','grant${index}','',1, 'maxlen=60', 'dynamic', 'inputbox', '', '${groupname}' );
-INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,xattr,type,link,groupname ) VALUES ( 'forms', ${index},${order_id},'database_grant_privilege${index}', 'privilege','ALL', 'ALL','',1, 'maxlen=60', 'dynamic', 'inputbox', '', '${groupname}' );
-INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,xattr,type,link,groupname ) VALUES ( 'forms', ${index},${order_id},'database_grant_db${index}', 'grant DB','dbname1', 'dbname1','',1, 'maxlen=60', 'dynamic', 'inputbox', '', '${groupname}' );
-INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,xattr,type,link,groupname ) VALUES ( 'forms', ${index},${order_id},'database_grant_role${index}', 'grant ROLE','pguser1', 'pguser1','',1, 'maxlen=60', 'dynamic', 'inputbox', '', '${groupname}' );
+INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,xattr,type,link,groupname ) VALUES ( 'forms', ${index},${order_id},'database_grant_name${_custom_id}','uniq grant name, e.g: mydb','grant${_custom_id}','grant${_custom_id}','',1, 'maxlen=60', 'dynamic', 'inputbox', '', '${groupname}' );
+INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,xattr,type,link,groupname ) VALUES ( 'forms', ${index},${order_id},'database_grant_privilege${_custom_id}', 'privilege','ALL', 'ALL','',1, 'maxlen=60', 'dynamic', 'inputbox', '', '${groupname}' );
+INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,xattr,type,link,groupname ) VALUES ( 'forms', ${index},${order_id},'database_grant_db${_custom_id}', 'grant DB','dbname1', 'dbname1','',1, 'maxlen=60', 'dynamic', 'inputbox', '', '${groupname}' );
+INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,xattr,type,link,groupname ) VALUES ( 'forms', ${index},${order_id},'database_grant_role${_custom_id}', 'grant ROLE','pguser1', 'pguser1','',1, 'maxlen=60', 'dynamic', 'inputbox', '', '${groupname}' );
 COMMIT;
 EOF
 	else
 		/bin/cat <<EOF
 BEGIN TRANSACTION;
-INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,xattr,type,link,groupname ) VALUES ( 'forms', ${index},${order_id},'roles_name${index}','roles part ${index}','','','',1, 'maxlen=60', 'dynamic', 'inputbox', '', '${groupname}' );
+INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,xattr,type,link,groupname ) VALUES ( 'forms', ${index},${order_id},'roles_name${_custom_id}','roles part ${_custom_id}','','','',1, 'maxlen=60', 'dynamic', 'inputbox', '', '${groupname}' );
 COMMIT;
 EOF
 	fi
@@ -83,27 +86,7 @@ usage()
 	echo "$0 -a add/remove -i index"
 }
 
-
-get_index()
-{
-	local new_index
-
-	[ ! -r "${formfile}" ] && err 1 "formfile not readable: ${formfile}"
-	new_index=$( ${SQLITE3_CMD} ${formfile} "SELECT group_id FROM forms WHERE groupname = '${groupname}' ORDER BY group_id DESC LIMIT 1" )
-
-	case "${action}" in
-		add|create)
-			index=$(( new_index + 1 ))
-			;;
-		del*|remove)
-			index=$new_index
-			;;
-	esac
-
-	[ "${index}" = "0" ] && index=1	# protect ADD custom button
-
-}
-
+### MAIN
 while getopts "a:i:f:o:" opt; do
 	case "$opt" in
 		a) action="${OPTARG}" ;;
@@ -115,9 +98,12 @@ while getopts "a:i:f:o:" opt; do
 done
 
 [ -z "${action}" ] && usage
-[ -z "${index}" -a -n "${formfile}" ] && get_index
-[ -z "${index}" -a -z "${formfile}" ] && index=1
-[ -z "${order_id}" -a -z "${formfile}" ] && order_id=1
+[ -z "${index}" ] && err 1 "${pgm}: empty index"
+[ -z "${order_id}" ] && err 1 "${pgm}: empty order_id"
+
+if [ ${index} -eq 1 ]; then
+	err 1 "${pgm} error: index=0"
+fi
 
 #echo "Index: $index, Action: $action, Groupname: $groupname"
 

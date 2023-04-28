@@ -22,6 +22,7 @@ set -e
 . ${distdir}/cbsd.conf
 . ${subrdir}/tools.subr
 . ${subr}
+. ${subrdir}/forms.subr
 set +e
 
 FORM_PATH="${workdir}/formfile"
@@ -40,24 +41,26 @@ err() {
 
 add()
 {
+	local _custom_id=
+	_custom_id=$( get_custom_id "hba_rules_type" )
 
 	if [ -r "${formfile}" ]; then
 		/usr/local/bin/cbsd ${miscdir}/updatesql ${formfile} ${distsharedir}/forms_yesno.schema purge_truefalse${index}
 
 		${SQLITE3_CMD} ${formfile} <<EOF
 BEGIN TRANSACTION;
-INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,xattr,type,link,groupname ) VALUES ( 'forms', ${index},${order_id},'hba_rules_type${index}','type of connection, e.g: "host"','host','','',1, 'maxlen=60', 'dynamic', 'inputbox', '', '${groupname}' );
-INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,xattr,type,link,groupname ) VALUES ( 'forms', ${index},${order_id},'hba_rules_address${index}','address for host type','0.0.0.0/0','0.0.0.0/0','',1, 'maxlen=60', 'dynamic', 'inputbox', '', '${groupname}' );
-INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,xattr,type,link,groupname ) VALUES ( 'forms', ${index},${order_id},'hba_rules_database${index}','list of database name(s) to which this rule applies','','','',1, 'maxlen=60', 'dynamic', 'inputbox', '', '${groupname}' );
-INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,xattr,type,link,groupname ) VALUES ( 'forms', ${index},${order_id},'hba_rules_user${index}','list of user and group name(s) to which this rule applies','','','',1, 'maxlen=60', 'dynamic', 'inputbox', '', '${groupname}' );
-INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,xattr,type,link,groupname ) VALUES ( 'forms', ${index},${order_id},'hba_rules_auth_method${index}','authentication method, e.g: "password","trust","md5"..','password','password','',1, 'maxlen=60', 'dynamic', 'inputbox', '', '${groupname}' );
-INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,xattr,type,link,groupname ) VALUES ( 'forms', ${index},${order_id},'hba_rules_order${index}','rule order, integer, eg: 00${index}','00${index}','00${index}','',1, 'maxlen=60', 'dynamic', 'inputbox', '', '${groupname}' );
+INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,xattr,type,link,groupname ) VALUES ( 'forms', ${index},${order_id},'hba_rules_type${_custom_id}','type of connection, e.g: "host"','host','','',1, 'maxlen=60', 'dynamic', 'inputbox', '', '${groupname}' );
+INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,xattr,type,link,groupname ) VALUES ( 'forms', ${index},${order_id},'hba_rules_address${_custom_id}','address for host type','0.0.0.0/0','0.0.0.0/0','',1, 'maxlen=60', 'dynamic', 'inputbox', '', '${groupname}' );
+INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,xattr,type,link,groupname ) VALUES ( 'forms', ${index},${order_id},'hba_rules_database${_custom_id}','list of database name(s) to which this rule applies','','','',1, 'maxlen=60', 'dynamic', 'inputbox', '', '${groupname}' );
+INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,xattr,type,link,groupname ) VALUES ( 'forms', ${index},${order_id},'hba_rules_user${_custom_id}','list of user and group name(s) to which this rule applies','','','',1, 'maxlen=60', 'dynamic', 'inputbox', '', '${groupname}' );
+INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,xattr,type,link,groupname ) VALUES ( 'forms', ${index},${order_id},'hba_rules_auth_method${_custom_id}','authentication method, e.g: "password","trust","md5"..','password','password','',1, 'maxlen=60', 'dynamic', 'inputbox', '', '${groupname}' );
+INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,xattr,type,link,groupname ) VALUES ( 'forms', ${index},${order_id},'hba_rules_order${_custom_id}','rule order, integer, eg: 00${_custom_id}','00${_custom_id}','00${_custom_id}','',1, 'maxlen=60', 'dynamic', 'inputbox', '', '${groupname}' );
 COMMIT;
 EOF
 	else
 		/bin/cat <<EOF
 BEGIN TRANSACTION;
-INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,type,link,groupname ) VALUES ( 'forms', ${index},${order_id},'hba_rule${index}','hba_rule part ${index}','','','',1, 'maxlen=60', 'inputbox', '', '${groupname}' );
+INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,type,link,groupname ) VALUES ( 'forms', ${index},${order_id},'hba_rule${_custom_id}','hba_rule part ${_custom_id}','','','',1, 'maxlen=60', 'inputbox', '', '${groupname}' );
 COMMIT;
 EOF
 	fi
@@ -119,11 +122,12 @@ while getopts "a:i:f:o:" opt; do
 done
 
 [ -z "${action}" ] && usage
-[ -z "${index}" -a -n "${formfile}" ] && get_index
-[ -z "${index}" -a -z "${formfile}" ] && index=1
-[ -z "${order_id}" -a -z "${formfile}" ] && order_id=1
+[ -z "${index}" ] && err 1 "${pgm}: empty index"
+[ -z "${order_id}" ] && err 1 "${pgm}: empty order_id"
 
-#echo "Index: $index, Action: $action, Groupname: $groupname"
+if [ ${index} -eq 1 ]; then
+	err 1 "${pgm} error: index=0"
+fi
 
 case "${action}" in
 	add|create)
@@ -136,3 +140,5 @@ case "${action}" in
 		echo "Unknown action: must be 'add' or 'del'"
 		;;
 esac
+
+exit 0

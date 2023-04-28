@@ -22,6 +22,7 @@ set -e
 . ${distdir}/cbsd.conf
 . ${subrdir}/tools.subr
 . ${subr}
+. ${subrdir}/forms.subr
 set +e
 
 FORM_PATH="${workdir}/formfile"
@@ -40,29 +41,37 @@ err() {
 
 add()
 {
+	local _custom_id=
+	_custom_id=$( get_custom_id "roles_name" )
 
 	if [ -r "${formfile}" ]; then
-		/usr/local/bin/cbsd ${miscdir}/updatesql ${formfile} ${distsharedir}/forms_yesno.schema is_superuser_truefalse
+		${SQLITE3_CMD} ${formfile} << EOF
+BEGIN TRANSACTION;
+DROP TABLE IF EXISTS is_superuser_truefalse${_custom_id};
+COMMIT;
+EOF
+
+		/usr/local/bin/cbsd ${miscdir}/updatesql ${formfile} ${distsharedir}/forms_yesno.schema is_superuser_truefalse${_custom_id}
 
 		# Put boolean for use_sasl_yesno
 		${SQLITE3_CMD} ${formfile} << EOF
 BEGIN TRANSACTION;
-INSERT INTO is_superuser_truefalse ( text, order_id ) VALUES ( 'true', 1 );
-INSERT INTO is_superuser_truefalse ( text, order_id ) VALUES ( 'false', 0 );
+INSERT INTO is_superuser_truefalse${_custom_id} ( text, order_id ) VALUES ( 'true', 1 );
+INSERT INTO is_superuser_truefalse${_custom_id} ( text, order_id ) VALUES ( 'false', 0 );
 COMMIT;
 EOF
 
 		${SQLITE3_CMD} ${formfile} <<EOF
 BEGIN TRANSACTION;
-INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,xattr,type,link,groupname ) VALUES ( 'forms', ${index},${order_id},'roles_name${index}','uniq database name, e.g: mydb','pguser${index}','pguser${index}','',1, 'maxlen=60', 'dynamic', 'inputbox', '', '${groupname}' );
-INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,xattr,type,link,groupname ) VALUES ( 'forms', ${index},${order_id},'roles_password_hash${index}', 'password for user','password{index}', 'password${index}','',1, 'maxlen=60', 'dynamic', 'inputbox', '', '${groupname}' );
-INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,xattr,type,link,groupname ) VALUES ( 'forms', ${index},${order_id},'roles_superuser${index}','Is superuser?','superuser${index}','superuser${index}','false',1, 'maxlen=60', 'dynamic', 'radio', 'is_superuser_truefalse', '${groupname}' );
+INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,xattr,type,link,groupname ) VALUES ( 'forms', ${index},${order_id},'roles_name${_custom_id}','uniq database name, e.g: mydb','pguser${_custom_id}','pguser${_custom_id}','',1, 'maxlen=60', 'dynamic', 'inputbox', '', '${groupname}' );
+INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,xattr,type,link,groupname ) VALUES ( 'forms', ${index},${order_id},'roles_password_hash${_custom_id}', 'password for user','password{_custom_id}', 'password${_custom_id}','',1, 'maxlen=60', 'dynamic', 'inputbox', '', '${groupname}' );
+INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,xattr,type,link,groupname ) VALUES ( 'forms', ${index},${order_id},'roles_superuser${_custom_id}','Is superuser?','superuser${_custom_id}','superuser${_custom_id}','false',1, 'maxlen=60', 'dynamic', 'radio', 'is_superuser_truefalse${_custom_id}', '${groupname}' );
 COMMIT;
 EOF
 	else
 		/bin/cat <<EOF
 BEGIN TRANSACTION;
-INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,xattr,type,link,groupname ) VALUES ( 'forms', ${index},${order_id},'roles_name${index}','roles part ${index}','','','',1, 'maxlen=60', 'dynamic', 'inputbox', '', '${groupname}' );
+INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,xattr,type,link,groupname ) VALUES ( 'forms', ${index},${order_id},'roles_name${_custom_id}','roles part ${_custom_id}','','','',1, 'maxlen=60', 'dynamic', 'inputbox', '', '${groupname}' );
 COMMIT;
 EOF
 	fi
@@ -124,11 +133,12 @@ while getopts "a:i:f:o:" opt; do
 done
 
 [ -z "${action}" ] && usage
-[ -z "${index}" -a -n "${formfile}" ] && get_index
-[ -z "${index}" -a -z "${formfile}" ] && index=1
-[ -z "${order_id}" -a -z "${formfile}" ] && order_id=1
+[ -z "${index}" ] && err 1 "${pgm}: empty index"
+[ -z "${order_id}" ] && err 1 "${pgm}: empty order_id"
 
-#echo "Index: $index, Action: $action, Groupname: $groupname"
+if [ ${index} -eq 1 ]; then
+	err 1 "${pgm} error: index=0"
+fi
 
 case "${action}" in
 	add|create)
@@ -141,3 +151,5 @@ case "${action}" in
 		echo "Unknown action: must be 'add' or 'del'"
 		;;
 esac
+
+exit 0
