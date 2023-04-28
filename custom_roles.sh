@@ -30,7 +30,7 @@ FORM_PATH="${workdir}/formfile"
 [ ! -d "${FORM_PATH}" ] && err 1 "No such ${FORM_PATH}"
 
 ###
-groupname="rolesgroup"
+groupname="roles"
 
 err() {
 	exitval=$1
