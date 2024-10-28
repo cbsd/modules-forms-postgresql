@@ -36,7 +36,7 @@ FORM_PATH="${workdir}/formfile"
 ${SQLITE3_CMD} ${FORM_PATH}/${HELPER}.sqlite << EOF
 BEGIN TRANSACTION;
 INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,type,link,groupname ) VALUES ( 'forms', 1,1,'-Globals','Globals','Globals','PP','',1, 'maxlen=60', 'delimer', '', '' );
-INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,type,link,groupname ) VALUES ( 'forms', 1,2,'postgres_ver','Postgresql version','2','13','',1, 'maxlen=5', 'inputbox', '', '' );
+INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,type,link,groupname ) VALUES ( 'forms', 1,2,'postgres_ver','Postgresql version','2','16','',1, 'maxlen=5', 'inputbox', '', '' );
 INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,type,link,groupname ) VALUES ( 'forms', 1,3,'-Additional','Additional params','Additional params','','',1, 'maxlen=60', 'delimer', '', '' );
 
 INSERT INTO forms ( mytable,group_id,order_id,param,desc,def,cur,new,mandatory,attr,type,link,groupname ) VALUES ( 'forms', 1,4,'bgwriter_delay','bgwriter_delay','500ms','500ms','',1, 'maxlen=42', 'inputbox', '', '' );
